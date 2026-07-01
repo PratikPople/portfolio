@@ -119,13 +119,22 @@ a {
   pointer-events: none;
   transform-style: preserve-3d;
   display: flex;
-  justify-content: center;
+  flex-direction: column;
+  justify-content: flex-start;
   align-items: center;
   overflow-y: auto;
   overflow-x: hidden;
   padding: 6rem 10% 8rem 10%;
   transition: none; /* Smoothness is managed by JavaScript LERP */
   z-index: 1;
+}
+
+.container > *:first-child {
+  margin-top: auto;
+}
+
+.container > *:last-child {
+  margin-bottom: auto;
 }
 
 /* Depth levels along the Z-axis */

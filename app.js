@@ -4,7 +4,11 @@
     const controls = document.querySelectorAll(".control");
     const maxDepth = 4500; // 3 gaps of 1500px
 
-    function update3D() {
+    let targetZ = 0;
+    let currentZ = 0;
+    let animFrameId = null;
+
+    function updateScrollPercent() {
         const scrollTop = window.scrollY || document.documentElement.scrollTop;
         const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
         
@@ -13,19 +17,39 @@
             scrollPercent = scrollTop / maxScroll;
         }
 
-        const scrollZ = scrollPercent * maxDepth;
+        targetZ = scrollPercent * maxDepth;
+        
+        // Start animation loop if not running
+        if (!animFrameId) {
+            animate();
+        }
+    }
+
+    function animate() {
+        // Linear interpolation (lerp) for smooth scroll damping
+        const diff = targetZ - currentZ;
+        
+        // If difference is extremely small, snap to target and halt loop
+        if (Math.abs(diff) < 0.05) {
+            currentZ = targetZ;
+            animFrameId = null;
+        } else {
+            currentZ += diff * 0.08; // Smoothness speed (lower = smoother/delayed, higher = faster)
+            animFrameId = requestAnimationFrame(animate);
+        }
 
         // Translate the 3D wrapper
         if (wrapper) {
-            wrapper.style.transform = `translateZ(${scrollZ}px)`;
+            wrapper.style.transform = `translateZ(${currentZ}px)`;
         }
 
-        // Calculate active index (from 0 to 3)
-        const activeIndex = Math.min(Math.round(scrollPercent * 3), 3);
+        // Calculate active index based on current Z position
+        const currentPercent = currentZ / maxDepth;
+        const activeIndex = Math.min(Math.round(currentPercent * 3), 3);
 
         sections.forEach((section, index) => {
             const depth = index * 1500;
-            const dist = scrollZ - depth; // Distance relative to camera (0 is at screen)
+            const dist = currentZ - depth; // Distance relative to camera (0 is at screen)
 
             let opacity = 0;
             if (dist >= -1500 && dist <= 0) {
@@ -63,11 +87,11 @@
     }
 
     // Scroll listener
-    window.addEventListener("scroll", update3D);
-    window.addEventListener("resize", update3D);
+    window.addEventListener("scroll", updateScrollPercent);
+    window.addEventListener("resize", updateScrollPercent);
 
     // Initial positioning
-    setTimeout(update3D, 100);
+    setTimeout(updateScrollPercent, 100);
 
     // Navigation click scrolling logic
     controls.forEach(button => {

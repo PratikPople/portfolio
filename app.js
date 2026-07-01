@@ -1,4 +1,10 @@
 (function () {
+    // Reset scroll position to top on page refresh
+    if ('scrollRestoration' in history) {
+        history.scrollRestoration = 'manual';
+    }
+    window.scrollTo(0, 0);
+
     const wrapper = document.querySelector(".wrapper-3d");
     const sections = document.querySelectorAll(".container");
     const controls = document.querySelectorAll(".control");

@@ -1,27 +1,89 @@
 (function () {
-    // 1. Navigation controls logic
+    const wrapper = document.querySelector(".wrapper-3d");
+    const sections = document.querySelectorAll(".container");
     const controls = document.querySelectorAll(".control");
+    const maxDepth = 4500; // 3 gaps of 1500px
+
+    function update3D() {
+        const scrollTop = window.scrollY || document.documentElement.scrollTop;
+        const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
+        
+        let scrollPercent = 0;
+        if (maxScroll > 0) {
+            scrollPercent = scrollTop / maxScroll;
+        }
+
+        const scrollZ = scrollPercent * maxDepth;
+
+        // Translate the 3D wrapper
+        if (wrapper) {
+            wrapper.style.transform = `translateZ(${scrollZ}px)`;
+        }
+
+        // Calculate active index (from 0 to 3)
+        const activeIndex = Math.min(Math.round(scrollPercent * 3), 3);
+
+        sections.forEach((section, index) => {
+            const depth = index * 1500;
+            const dist = scrollZ - depth; // Distance relative to camera (0 is at screen)
+
+            let opacity = 0;
+            if (dist >= -1500 && dist <= 0) {
+                // Fade in as it approaches
+                opacity = (dist + 1500) / 1500;
+            } else if (dist > 0 && dist <= 300) {
+                // Fade out as it goes past camera
+                opacity = 1 - (dist / 300);
+            }
+
+            section.style.opacity = opacity;
+            
+            if (index === activeIndex && dist >= -750 && dist <= 150) {
+                section.classList.add("active");
+                section.style.pointerEvents = "auto";
+            } else {
+                section.classList.remove("active");
+                section.style.pointerEvents = "none";
+            }
+        });
+
+        // Update active class in navigation controls
+        controls.forEach(button => {
+            const targetId = button.dataset.id;
+            const targetSection = document.getElementById(targetId);
+            if (targetSection) {
+                const sectionIndex = parseInt(targetSection.dataset.depth || "0", 10);
+                if (sectionIndex === activeIndex) {
+                    button.classList.add("active-btn");
+                } else {
+                    button.classList.remove("active-btn");
+                }
+            }
+        });
+    }
+
+    // Scroll listener
+    window.addEventListener("scroll", update3D);
+    window.addEventListener("resize", update3D);
+
+    // Initial positioning
+    setTimeout(update3D, 100);
+
+    // Navigation click scrolling logic
     controls.forEach(button => {
         button.addEventListener("click", function() {
-            // Remove active-btn from the previous active button
-            const activeBtn = document.querySelector(".active-btn");
-            if (activeBtn) {
-                activeBtn.classList.remove("active-btn");
-            }
-            this.classList.add("active-btn");
-
-            // Remove active from the previous active section
-            const activeSection = document.querySelector(".active");
-            if (activeSection) {
-                activeSection.classList.remove("active");
-            }
-
-            // Find target section and activate it
             const targetId = button.dataset.id;
             if (targetId) {
                 const targetSection = document.getElementById(targetId);
                 if (targetSection) {
-                    targetSection.classList.add("active");
+                    const sectionIndex = parseInt(targetSection.dataset.depth || "0", 10);
+                    const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
+                    const targetScroll = (sectionIndex / 3) * maxScroll;
+                    
+                    window.scrollTo({
+                        top: targetScroll,
+                        behavior: "smooth"
+                    });
                 }
             }
         });

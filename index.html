@@ -13,7 +13,10 @@
     
 </head>
 <body class="main-content">
-    <header class="container header active" id="home">
+    <div class="scroll-tracker"></div>
+    <div class="viewport-3d">
+        <div class="wrapper-3d">
+            <header class="container header active" id="home" data-depth="0">
         <div class="header-content">
             <div class="left-header">
                 <div class="image-container">
@@ -41,7 +44,7 @@
         </div>
     </header>
     <main>
-        <section class="container about" id="about">
+        <section class="container about" id="about" data-depth="1">
             <div class="main-title">
                 <h2>About <span>me</span><span class="bg-text">my stats</span></h2>
             </div>
@@ -177,7 +180,7 @@
                 </div>
             </div>
         </section>
-        <section class="container" id="portfolio">
+        <section class="container" id="portfolio" data-depth="2">
             <div class="main-title">
                 <h2>My <span>Portfolio</span><span class="bg-text">My Work</span></h2>
             </div>
@@ -300,7 +303,7 @@
             </div>
         </section>
         
-        <section class="container contact" id="contact">
+        <section class="container contact" id="contact" data-depth="3">
             <div class="contact-container">
                 <div class="main-title">
                     <h2>Contact <span>Me</span><span class="bg-text">Contact</span></h2>
@@ -404,6 +407,8 @@
             </div>
         </section>
     </main>
+        </div>
+    </div>
 
     <div class="controls">
         <div class="control active-btn" data-id="home" >
